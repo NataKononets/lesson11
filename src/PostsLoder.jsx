@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
+import PostsList from "./components/PostsList.jsx";
+import FavoriteList from "./components/FavoriteList.jsx";
+
 const LIMIT = 10;
+
 export default function PostsLoder() {
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(0);
@@ -14,19 +18,19 @@ export default function PostsLoder() {
       setError("");
 
       const start = nextPage * LIMIT;
-
       const response = await fetch(`https://jsonplaceholder.typicode.com/posts?_start=${start}&_limit=${LIMIT}`);
 
       if (!response.ok) {
         throw new Error("Loading error");
       }
 
-     const data = await response.json();
+      const data = await response.json();
 
       if (data.length < LIMIT) {
         setHasMore(false);
       }
 
+      // щоб не було дублів постів
       setPosts((prev) => {
         const existingIds = new Set(prev.map((p) => p.id));
         const uniqueNew = data.filter((p) => !existingIds.has(p.id));
@@ -43,15 +47,16 @@ export default function PostsLoder() {
 
   function toggleFavorite(id) {
     setFavoriteIds((prev) =>
-      prev.includes(id) ? prev.filter((favId) => favId !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   }
 
+  // ❌ видалити один пост з обраних
   function removeFavorite(id) {
     setFavoriteIds((prev) => prev.filter((favId) => favId !== id));
   }
 
-
+  // 🧹 очистити всі обрані
   function clearFavorites() {
     setFavoriteIds([]);
   }
@@ -60,11 +65,12 @@ export default function PostsLoder() {
     loadPosts(0);
   }, []);
 
-  const favoritePosts = posts.filter((post) => favoriteIds.includes(post.id));
+  const favoritePosts = posts.filter((post) =>
+    favoriteIds.includes(post.id)
+  );
 
   return (
-    <div className="card shadow-sm max-100"  style={{borderRadius: 0}}>
-       
+    <div className="card shadow-sm">
       <div className="card-body">
         <h2 className="h4 mb-3">Пости з JSONPlaceholder</h2>
 
@@ -74,44 +80,16 @@ export default function PostsLoder() {
           </div>
         )}
 
-        <ul className="list-group mb-3">
-          {posts.map((post) => {
-            const isFavorite = favoriteIds.includes(post.id);
+        {/* список всіх постів */}
+        <PostsList
+          posts={posts}
+          favoriteIds={favoriteIds}
+          toggleFavorite={toggleFavorite}
+          loading={loading}
+          error={error}
+        />
 
-            return (
-              <li
-                key={`post-${post.id}`}
-                className="list-group-item d-flex flex-column gap-1"
-              >
-                <div className="d-flex align-items-start gap-2">
-                  <div>
-                    <h5 className="mb-1">
-                      {post.id}. {post.title}
-                    </h5>
-                    <p className="mb-0 text-muted">{post.body}</p>
-                  </div>
-
-                  <button
-                    type="button"
-                    className={
-                      "btn btn-sm ms-auto " +
-                      (isFavorite ? "btn-warning" : "btn-outline-warning")
-                    }
-                    onClick={() => toggleFavorite(post.id)}
-                  >
-                    {isFavorite ? "В обраному ★" : "В обране ☆"}
-                  </button>
-                </div>
-              </li>
-            );
-          })}
-
-          {!loading && posts.length === 0 && !error && (
-            <li className="list-group-item text-center text-muted">
-              Даних ще немає
-            </li>
-          )}
-        </ul>
+        {/* кнопка часткового завантаження */}
         <div className="d-flex align-items-center gap-2 mb-3">
           <button
             type="button"
@@ -119,7 +97,11 @@ export default function PostsLoder() {
             onClick={() => loadPosts(page + 1)}
             disabled={loading || !hasMore}
           >
-            {loading ? "Завантаження..." : hasMore ? "Завантажити ще" : "Більше немає"}
+            {loading
+              ? "Завантаження..."
+              : hasMore
+              ? "Завантажити ще"
+              : "Більше немає"}
           </button>
 
           {loading && (
@@ -128,60 +110,22 @@ export default function PostsLoder() {
             </div>
           )}
 
-{!hasMore && !loading && (
-            <span className="text-muted small">Усі пости вже завантажені</span>
+          {!hasMore && !loading && (
+            <span className="text-muted small">
+              Усі пости вже завантажені
+            </span>
           )}
         </div>
 
-        <div className="border-top pt-3">
-          <div className="d-flex align-items-center justify-content-between mb-2">
-            <h3 className="h5 d-flex align-items-center gap-2 mb-0">
-              Обрані пости
-              <span className="badge bg-warning text-dark">
-                {favoritePosts.length}
-              </span>
-            </h3>
-
-            {favoritePosts.length > 0 && (
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-danger"
-                onClick={clearFavorites}
-              >
-                Очистити обрані
-              </button>
-            )}
-          </div>
-
-          {favoritePosts.length === 0 ? (
-            <p className="text-muted mb-0">
-              Поки що немає обраних постів. Натисніть кнопку{" "}
-              <span className="fw-semibold">“В обране”</span> біля потрібного посту.
-            </p>
-          ) : (
-            <ul className="list-group mt-2">
-              {favoritePosts.map((post) => (
-                <li
-                  key={`fav-${post.id}`}
-                  className="list-group-item d-flex align-items-center justify-content-between"
-                >
-                  <span>
-                    <strong>{post.id}.</strong> {post.title}
-                  </span>
-
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-outline-danger"
-                    onClick={() => removeFavorite(post.id)}
-                  >
-                    Видалити
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        {/* блок обраних постів */}
+        <FavoriteList
+          favoritePosts={favoritePosts}
+          removeFavorite={removeFavorite}
+          clearFavorites={clearFavorites}
+        />
       </div>
     </div>
   );
 }
+
+
