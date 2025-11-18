@@ -16,10 +16,8 @@ export default function PostsLoder() {
     try {
       setLoading(true);
       setError("");
-
       const start = nextPage * LIMIT;
       const response = await fetch(`https://jsonplaceholder.typicode.com/posts?_start=${start}&_limit=${LIMIT}`);
-
       if (!response.ok) {
         throw new Error("Loading error");
       }
@@ -92,8 +90,8 @@ export default function PostsLoder() {
             {loading
               ? "Завантаження..."
               : hasMore
-              ? "Завантажити ще"
-              : "Більше немає"}
+              ? "Завантажити "
+              : "Більше немає!!!"}
           </button>
 
           {loading && (

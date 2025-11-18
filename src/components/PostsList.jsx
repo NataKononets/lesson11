@@ -25,7 +25,7 @@ export default function PostsList({ posts, favoriteIds, toggleFavorite, loading,
                 }
                 onClick={() => toggleFavorite(post.id)}
               >
-                {isFavorite ? "В обраному ★" : "В обране ☆"}
+                {isFavorite ? "В обраному ★" : "обране ☆"}
               </button>
             </div>
           </li>

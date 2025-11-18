@@ -4,7 +4,7 @@ export default function FavoriteList({ favoritePosts, removeFavorite, clearFavor
  <div className="border-top pt-3">
           <div className="d-flex align-items-center justify-content-between mb-2">
             <h3 className="h5 d-flex align-items-center gap-2 mb-0">
-              Обрані пости
+              Обрані пости!!!
               <span className="badge bg-warning text-dark">
                 {favoritePosts.length}
               </span>
@@ -23,7 +23,7 @@ export default function FavoriteList({ favoritePosts, removeFavorite, clearFavor
 
           {favoritePosts.length === 0 ? (
             <p className="text-muted mb-0">
-              Поки що немає обраних постів. Натисніть кнопку{" "}
+              Поки, що немає обраних постів. Натисніть кнопку{" "}
               <span className="fw-semibold">“В обране”</span> біля потрібного посту.
             </p>
           ) : (
