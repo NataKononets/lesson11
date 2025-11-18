@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PostsList from "./components/PostsList.jsx";
-import FavoriteList from "./components/FavoriteList.jsx";
+import FavoriteList from "//components/FavoriteList.jsx";
 
 const LIMIT = 10;
 
@@ -30,7 +30,6 @@ export default function PostsLoder() {
         setHasMore(false);
       }
 
-      // щоб не було дублів постів
       setPosts((prev) => {
         const existingIds = new Set(prev.map((p) => p.id));
         const uniqueNew = data.filter((p) => !existingIds.has(p.id));
@@ -50,13 +49,9 @@ export default function PostsLoder() {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   }
-
-  // ❌ видалити один пост з обраних
   function removeFavorite(id) {
     setFavoriteIds((prev) => prev.filter((favId) => favId !== id));
   }
-
-  // 🧹 очистити всі обрані
   function clearFavorites() {
     setFavoriteIds([]);
   }
@@ -80,7 +75,6 @@ export default function PostsLoder() {
           </div>
         )}
 
-        {/* список всіх постів */}
         <PostsList
           posts={posts}
           favoriteIds={favoriteIds}
@@ -88,8 +82,6 @@ export default function PostsLoder() {
           loading={loading}
           error={error}
         />
-
-        {/* кнопка часткового завантаження */}
         <div className="d-flex align-items-center gap-2 mb-3">
           <button
             type="button"
@@ -117,7 +109,6 @@ export default function PostsLoder() {
           )}
         </div>
 
-        {/* блок обраних постів */}
         <FavoriteList
           favoritePosts={favoritePosts}
           removeFavorite={removeFavorite}
